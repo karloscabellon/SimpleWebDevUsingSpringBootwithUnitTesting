@@ -1,24 +1,44 @@
 package com.example.ToDoList.controllers;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.example.ToDoList.models.Tasks;
+import com.example.ToDoList.services.TaskService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
+@RequestMapping("/api/v1/tasks")
 public class HomeController {
 
-    @Value("${spring.application.name:My Spring App}")
-    public String appName;
-
-    /**
-     * Handles HTTP GET requests to the "/hello" path.
-     * The method returns a string which is written directly to the HTTP response body.
-     *
-     * @return A greeting message including the application name.
-     */
-    @RequestMapping("/hello")
-    public String index() {
-        System.out.println("Hello from " + appName + "! Your application is using the REST pattern.");
-        return "index.html";
+    @Autowired
+    private TaskService taskService;
+    @GetMapping("/")
+    public ResponseEntity<List<Tasks>> getAllTasks() {
+        return ResponseEntity.ok(taskService.getAllTask());
+    }
+    @GetMapping("/completed")
+    public ResponseEntity<List<Tasks>> getAllCompletedTasks() {
+        return ResponseEntity.ok(taskService.findAllCompletedTask());
+    }
+    @GetMapping("/incomplete")
+    public ResponseEntity<List<Tasks>> getAllIncompleteTasks() {
+        return ResponseEntity.ok(taskService.findAllInCompleteTask());
+    }
+    @PostMapping("/")
+    public ResponseEntity<Tasks> createTask(@RequestBody Tasks task) {
+        return ResponseEntity.ok(taskService.createNewTask(task));
+    }
+    @PutMapping("/{id}")
+    public ResponseEntity<Tasks> updateTask(@PathVariable Long id, @RequestBody Tasks task) {
+        task.setId(id);
+        return ResponseEntity.ok(taskService.updateTask(task));
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Boolean> getAllTasks(@PathVariable Tasks id) {
+        taskService.deleteTask(id);
+        return ResponseEntity.ok(true);
     }
 }
